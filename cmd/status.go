@@ -109,13 +109,18 @@ func getPipelineToMonitor(args []string, region string, profile string) string {
 
 	var pipelines []string
 
-	log.Println("first page results:")
 	for _, object := range output.Pipelines {
 		pipelines = append(pipelines, *object.Name)
 	}
 
+	if len(pipelines) == 0 {
+		fmt.Printf("No Pipelines found in Region %s with Profile %s \n", aurora.Green("ds"), aurora.Green("t"))
+		fmt.Println(aurora.Bold(aurora.BrightRed("No Pipelines found, Please check the profile is correct, and that you are authenticated.")))
+		os.Exit(1)
+	}
+
 	prompt := promptui.Select{
-		Label: "Pipeline",
+		Label: "Select the pipeline to monitor",
 		Items: pipelines,
 	}
 
