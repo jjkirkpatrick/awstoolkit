@@ -17,11 +17,15 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/codepipeline"
+	"github.com/logrusorgru/aurora"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -36,19 +40,53 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		//get region and profile from config or cli
 		Region := cmd.Flag("region").Value.String()
 		Profile := cmd.Flag("profile").Value.String()
+		fmt.Println(aurora.Bold(aurora.Cyan("AWS CodePipeline Status")))
+
+		// va;idate region and profile are set, else exit
+		if !validateRegion(Region) {
+			fmt.Println(aurora.Bold(aurora.BrightRed("Region is required, but not set see -h flag")))
+			return
+		}
+		if !validateProfile(Profile) {
+			fmt.Println(aurora.Bold(aurora.BrightRed("Profile is required but not set see -h flag")))
+			return
+		}
+
+		header(Region, Profile)
 		status(args, Region, Profile)
 	},
 }
 
+func validateRegion(region string) bool {
+	if region == "" {
+		return false
+	}
+	return true
+}
+
+func validateProfile(profile string) bool {
+	if profile == "" {
+		return false
+	}
+	return true
+}
+
+func header(region string, profile string) {
+	fmt.Println("Running command against Region ", aurora.Magenta(region))
+	fmt.Println("Running command against Profile ", aurora.Bold(aurora.Cyan(profile)))
+}
 
 func status(args []string, region, profile string) {
-	getPipelineExecution(args, region, profile)
+	pipeline := getPipelineToMonitor(args, region, profile)
+
+	fmt.Println("Pipeline: " + pipeline)
 
 }
 
-func getPipelineExecution(args []string, region string, profile string) {
+func getPipelineToMonitor(args []string, region string, profile string) string {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion(region),
 		config.WithSharedConfigProfile(profile),
@@ -65,15 +103,30 @@ func getPipelineExecution(args []string, region string, profile string) {
 	output, err := client.ListPipelines(context.TODO(), &codepipeline.ListPipelinesInput{MaxResults: aws.Int32(100)})
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(aurora.Bold(aurora.BrightRed("Unable to get list of Pipelines, Please check the profile is correct, and that you are authenticated.")))
+		os.Exit(1)
 	}
+
+	var pipelines []string
 
 	log.Println("first page results:")
 	for _, object := range output.Pipelines {
-		log.Printf("key=%s size=%d", aws.ToString(object.Name), object.Created)
+		pipelines = append(pipelines, *object.Name)
 	}
 
-	//
+	prompt := promptui.Select{
+		Label: "Pipeline",
+		Items: pipelines,
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return ""
+	}
+
+	return result
 }
 
 func init() {
