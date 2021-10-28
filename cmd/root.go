@@ -56,6 +56,9 @@ func init() {
 
 	rootCmd.MarkFlagRequired("region")
 	rootCmd.MarkFlagRequired("profile")
+
+	viper.BindPFlag("profile", rootCmd.PersistentFlags().Lookup("profile"))
+	viper.BindPFlag("region", rootCmd.PersistentFlags().Lookup("region"))
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
