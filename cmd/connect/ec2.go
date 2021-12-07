@@ -13,15 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package connect
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// connectCmd represents the connect command
-var connectCmd = &cobra.Command{
-	Use:   "connect",
+// ec2Cmd represents the ec2 command
+var ec2Cmd = &cobra.Command{
+	Use:   "ec2",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -30,20 +32,29 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		Region := cmd.Flag("region").Value.String()
+		Profile := cmd.Flag("profile").Value.String()
+		connect(args, Region, Profile)
 	},
 }
 
+func connect(argv []string, Region, Profile string) {
+	fmt.Println(argv)
+	fmt.Println(Region)
+	fmt.Println(Profile)
+	fmt.Println("connect called")
+}
+
 func init() {
-	rootCmd.AddCommand(connectCmd)
+	connectCmd.AddCommand(ec2Cmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// connectCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// ec2Cmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// connectCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// ec2Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

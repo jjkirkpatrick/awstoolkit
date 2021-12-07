@@ -27,8 +27,8 @@ var cfgFile string
 var region string
 var profile string
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+// RootCmd represents the base command when called without any subcommands
+var RootCmd = &cobra.Command{
 	Use:   "awsclihelper ",
 	Short: "A CLI tool to help with daily AWS activities",
 	Long:  `.`,
@@ -38,9 +38,9 @@ var rootCmd = &cobra.Command{
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by main.main(). It only needs to happen once to the RootCmd.
 func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+	cobra.CheckErr(RootCmd.Execute())
 }
 
 func init() {
@@ -50,18 +50,19 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.awsclihelper.yaml)")
-	rootCmd.PersistentFlags().StringVar(&region, "region", "eu-west-1", "AWS Region")
-	rootCmd.PersistentFlags().StringVar(&profile, "profile", "", "AWS Profile to use ")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.awsclihelper.yaml)")
+	RootCmd.PersistentFlags().StringVar(&region, "region", "eu-west-1", "AWS Region")
+	RootCmd.PersistentFlags().StringVar(&profile, "profile", "", "AWS Profile to use ")
 
-	rootCmd.MarkFlagRequired("region")
-	rootCmd.MarkFlagRequired("profile")
+	RootCmd.MarkFlagRequired("region")
+	RootCmd.MarkFlagRequired("profile")
 
-	viper.BindPFlag("profile", rootCmd.PersistentFlags().Lookup("profile"))
-	viper.BindPFlag("region", rootCmd.PersistentFlags().Lookup("region"))
+	viper.BindPFlag("profile", RootCmd.PersistentFlags().Lookup("profile"))
+	viper.BindPFlag("region", RootCmd.PersistentFlags().Lookup("region"))
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
