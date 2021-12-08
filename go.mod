@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.9.0
 	github.com/aws/aws-sdk-go-v2/service/codepipeline v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.13.1
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.17.1
 	github.com/inancgumus/screen v0.0.0-20190314163918-06e984b86ed3
 	github.com/logrusorgru/aurora v2.0.3+incompatible

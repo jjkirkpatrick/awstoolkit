@@ -193,6 +193,7 @@ func runCommand(process string, args ...string) error {
 	}()
 	defer close(sigs)
 
+	fmt.Println(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
