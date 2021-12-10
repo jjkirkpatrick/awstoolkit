@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -51,8 +50,8 @@ func init() {
 	// will be global for your application.
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.awsclihelper.yaml)")
-	RootCmd.PersistentFlags().StringVar(&region, "region", "eu-west-1", "AWS Region")
-	RootCmd.PersistentFlags().StringVar(&profile, "profile", "", "AWS Profile to use ")
+	RootCmd.PersistentFlags().StringP("region", "r", "eu-west-1", "AWS Region")
+	RootCmd.PersistentFlags().StringP("profile", "p", "", "AWS Profile to use ")
 
 	RootCmd.MarkFlagRequired("region")
 	RootCmd.MarkFlagRequired("profile")
@@ -76,15 +75,12 @@ func initConfig() {
 		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".awsclihelper" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
 		viper.SetConfigName(".awsclihelper")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(home)
+		viper.ReadInConfig()
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	}
 }

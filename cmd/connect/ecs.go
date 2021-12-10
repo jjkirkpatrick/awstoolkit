@@ -18,24 +18,15 @@ package connect
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	internal "github.com/jjkirkpatrick/awsclihelper/internal"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
-
-type execCommand struct {
-	client  *ecs.Client
-	args    []string
-	region  string
-	profile string
-}
 
 // ecsCmd represents the ecs command
 var ecsCmd = &cobra.Command{
@@ -48,53 +39,26 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(aurora.Bold(aurora.BrightGreen("ECS Connect. Running with Profile ")), aurora.BrightCyan(viper.GetString("profile")), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
-		e := createECSExecCommand()
+		e, _ := internal.NewClient()
+		fmt.Println(aurora.Bold(aurora.BrightGreen("ECS Connect. Running with Profile ")), aurora.BrightCyan(e.Profile), aurora.BrightGreen("and Region "), aurora.BrightCyan(e.Region))
 		ecsConnect(e)
 	},
 }
 
-func createECSExecCommand() *execCommand {
-	client := createECSClient("ecs")
-	e := &execCommand{
-		region:  viper.GetString("region"),
-		profile: viper.GetString("profile"),
-		client:  client,
-	}
-	return e
-}
+func getClusters(c *internal.Client) string {
 
-func createECSClient(clientType string) *ecs.Client {
-	region := viper.GetString("region")
-	profile := viper.GetString("profile")
+	input := &ecs.ListClustersInput{}
 
-	// validate region and profile are set, else exit
-	if !validateRegion(region) {
-		fmt.Println(aurora.Bold(aurora.BrightRed("Region is required, but not set see -h flag")))
-	}
-	if !validateProfile(profile) {
-		fmt.Println(aurora.Bold(aurora.BrightRed("Profile is required but not set see -h flag")))
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion(region),
-		config.WithSharedConfigProfile(profile),
-	)
+	result, err := c.ECS.ListClusters(context.TODO(), input)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
-	return ecs.NewFromConfig(cfg)
-
-}
-
-func getClusters(e *execCommand) string {
-	input := &ecs.ListClustersInput{}
-	result, err := e.client.ListClusters(context.TODO(), input)
 	if err != nil {
 		panic(err)
 	}
+
 	for _, cluster := range result.ClusterArns {
 		fmt.Println(cluster)
 	}
@@ -103,7 +67,6 @@ func getClusters(e *execCommand) string {
 		return result.ClusterArns[0]
 	} else if len(result.ClusterArns) < 1 {
 		fmt.Println(aurora.Bold(aurora.BrightRed("No clusters found")))
-		return ""
 		os.Exit(1)
 	}
 
@@ -119,11 +82,11 @@ func getClusters(e *execCommand) string {
 
 }
 
-func getTasks(e *execCommand, clusterArn string) string {
+func getTasks(e *internal.Client, clusterArn string) string {
 	input := &ecs.ListTasksInput{
 		Cluster: &clusterArn,
 	}
-	result, err := e.client.ListTasks(context.TODO(), input)
+	result, err := e.ECS.ListTasks(context.TODO(), input)
 	if err != nil {
 		panic(err)
 	}
@@ -137,7 +100,7 @@ func getTasks(e *execCommand, clusterArn string) string {
 		Cluster: &clusterArn,
 		Tasks:   result.TaskArns,
 	}
-	describeTaskResult, err := e.client.DescribeTasks(context.TODO(), describeTaskinput)
+	describeTaskResult, err := e.ECS.DescribeTasks(context.TODO(), describeTaskinput)
 	if err != nil {
 		fmt.Println(aurora.Bold(aurora.BrightRed("Error describing tasks")))
 	}
@@ -161,9 +124,9 @@ func getTasks(e *execCommand, clusterArn string) string {
 
 }
 
-func ecsConnect(e *execCommand) {
-	clusterArn := getClusters(e)
-	task := strings.Split(getTasks(e, clusterArn), " : ")[1]
+func ecsConnect(c *internal.Client) {
+	clusterArn := getClusters(c)
+	task := strings.Split(getTasks(c, clusterArn), " : ")[1]
 	fmt.Println(aurora.Bold(aurora.BrightGreen("Connecting to")), aurora.BrightCyan(task))
 
 	arg0 := "aws"
@@ -173,10 +136,10 @@ func ecsConnect(e *execCommand) {
 	arg4 := "--cluster=" + clusterArn
 	arg5 := "--command=/bin/bash"
 	arg6 := "--interactive"
-	arg7 := "--region=" + e.region
-	arg8 := "--profile=" + e.profile
+	arg7 := "--region=" + c.Region
+	arg8 := "--profile=" + c.Profile
 
-	if err := runCommand(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); err != nil {
+	if err := internal.RunCommand(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); err != nil {
 		return
 	}
 
