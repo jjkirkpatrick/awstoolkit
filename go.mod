@@ -4,12 +4,12 @@ go 1.17
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
-	github.com/aws/aws-sdk-go v1.42.22
 	github.com/aws/aws-sdk-go-v2 v1.11.2
 	github.com/aws/aws-sdk-go-v2/config v1.9.0
 	github.com/aws/aws-sdk-go-v2/service/codepipeline v1.6.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.25.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.13.1
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.14.2
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.17.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.8.0
 	github.com/inancgumus/screen v0.0.0-20190314163918-06e984b86ed3

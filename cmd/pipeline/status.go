@@ -34,9 +34,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(aurora.Bold(aurora.BrightGreen("Pipeline monitor. Running with Profile ")), aurora.BrightCyan(viper.GetString("profile")), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
 		e := &pipelineStatus{}
 		c, _ := internal.NewClient()
+		fmt.Println(aurora.Bold(aurora.BrightGreen("Pipeline monitor. Running with Profile ")), aurora.BrightCyan(viper.GetString("profile")), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
 		status(e, c)
 
 	},
