@@ -14,7 +14,6 @@ import (
 	"github.com/jjkirkpatrick/awsclihelper/internal"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type pipelineStatus struct {
@@ -36,7 +35,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		e := &pipelineStatus{}
 		c, _ := internal.NewClient()
-		fmt.Println(aurora.Bold(aurora.BrightGreen("Pipeline monitor. Running with Profile ")), aurora.BrightCyan(viper.GetString("profile")), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
+		c.CmdHeader()
 		status(e, c)
 
 	},

@@ -88,6 +88,7 @@ func getProfile() (string, error) {
 	if profile == "" {
 		//read env var for AWS_DEFAULT_PROFILE
 		profile = os.Getenv("AWS_DEFAULT_PROFILE")
+		viper.Set("Profile", profile)
 	}
 
 	if profile != "" {
@@ -104,6 +105,16 @@ func validateRegion(region string) bool {
 	regUsGov, _ := regexp.Compile("^us\\-gov\\-\\w+\\-\\d+$")
 
 	return reg.MatchString(region) || regChina.MatchString(region) || regUsGov.MatchString(region)
+}
+
+func (c *Client) CmdHeader() {
+
+	if c.Profile != "" {
+		fmt.Println(aurora.Bold(aurora.BrightGreen("Running with Profile ")), aurora.BrightCyan(viper.GetString("profile")), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
+	} else {
+		fmt.Println(aurora.Bold(aurora.BrightGreen("Running with")), aurora.BrightCyan("Default Credentials"), aurora.BrightGreen("and Region "), aurora.BrightCyan(viper.GetString("region")))
+	}
+
 }
 
 func RunCommand(process string, args ...string) error {
