@@ -24,7 +24,8 @@ changelog:
       - Update README
       - Update CHANGELOG
 furies:
-  - account: jjkirkpatrick
+  - 
+    account: jjkirkpatrick
     secret_name: "{{ .Env.FURYIO_TOKEN }}"
 
     # IDs to filter by.
