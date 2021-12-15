@@ -18,6 +18,7 @@ package main
 import (
 	"github.com/jjkirkpatrick/awsclihelper/cmd"
 	_ "github.com/jjkirkpatrick/awsclihelper/cmd/connect"
+	_ "github.com/jjkirkpatrick/awsclihelper/cmd/ec2"
 	_ "github.com/jjkirkpatrick/awsclihelper/cmd/pipeline"
 )
 
