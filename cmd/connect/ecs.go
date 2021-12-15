@@ -39,9 +39,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		e, _ := internal.NewClient()
-		fmt.Println(aurora.Bold(aurora.BrightGreen("ECS Connect. Running with Profile ")), aurora.BrightCyan(e.Profile), aurora.BrightGreen("and Region "), aurora.BrightCyan(e.Region))
-		ecsConnect(e)
+		c, _ := internal.NewClient()
+		c.CmdHeader()
+		ecsConnect(c)
 	},
 }
 
@@ -53,10 +53,7 @@ func getClusters(c *internal.Client) string {
 
 	if err != nil {
 		fmt.Println(err)
-	}
-
-	if err != nil {
-		panic(err)
+		os.Exit(0)
 	}
 
 	for _, cluster := range result.ClusterArns {
@@ -66,8 +63,8 @@ func getClusters(c *internal.Client) string {
 	if len(result.ClusterArns) == 1 {
 		return result.ClusterArns[0]
 	} else if len(result.ClusterArns) < 1 {
-		fmt.Println(aurora.Bold(aurora.BrightRed("No clusters found")))
-		os.Exit(1)
+		fmt.Println(aurora.Bold(aurora.BrightRed("No clusters found, please check profile and region")))
+		os.Exit(0)
 	}
 
 	choice := ""
@@ -88,7 +85,8 @@ func getTasks(e *internal.Client, clusterArn string) string {
 	}
 	result, err := e.ECS.ListTasks(context.TODO(), input)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	if len(result.TaskArns) < 1 {

@@ -19,6 +19,7 @@ import (
 	"github.com/jjkirkpatrick/awsclihelper/cmd"
 	_ "github.com/jjkirkpatrick/awsclihelper/cmd/connect"
 	_ "github.com/jjkirkpatrick/awsclihelper/cmd/pipeline"
+	_ "github.com/jjkirkpatrick/awsclihelper/cmd/r53"
 )
 
 func main() {
