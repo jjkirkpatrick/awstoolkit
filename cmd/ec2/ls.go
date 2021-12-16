@@ -1,8 +1,10 @@
 package ec2
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/jjkirkpatrick/awsclihelper/internal"
 	"github.com/spf13/cobra"
 )
@@ -20,13 +22,30 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		c, _ := internal.NewClient()
 		c.CmdHeader()
-		test()
+		ls(c)
 
 	},
 }
 
-func test() {
-	fmt.Println("ec2 ls called")
+func ls(c *internal.Client) {
+
+	// list all ec2 instances
+	resp, err := c.EC2.DescribeInstances(context.TODO(), &ec2.DescribeInstancesInput{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("ec2 instances:")
+	for _, r := range resp.Reservations {
+		for _, i := range r.Instances {
+			fmt.Print(*i.InstanceId)
+			fmt.Print("\t", *&i.InstanceType)
+			fmt.Print("\t", *i.ImageId)
+			fmt.Print("\t", *i.Tags[0].Value)
+			fmt.Println()
+		}
+	}
+
 }
 
 func init() {

@@ -37,7 +37,6 @@ to quickly create a Cobra application.`,
 		c, _ := internal.NewClient()
 		c.CmdHeader()
 		status(e, c)
-
 	},
 }
 
